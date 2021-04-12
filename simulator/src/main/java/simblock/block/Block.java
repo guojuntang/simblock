@@ -18,6 +18,8 @@ package simblock.block;
 
 import simblock.node.Node;
 
+import java.util.ArrayList;
+
 /**
  * The representation of a block.
  */
@@ -31,6 +33,17 @@ public class Block {
    * The parent {@link Block}.
    */
   private final Block parent;
+
+  /**
+   * root Hash of merkle tree
+   */
+  private String rootHash;
+
+  /**
+   * Transactions' list, stored as json string
+   * (block body)
+   */
+  private ArrayList<String> txList;
 
   /**
    * The {@link Node} that minted the block.
@@ -139,6 +152,33 @@ public class Block {
     } else {
       return this.parent.getBlockWithHeight(height);
     }
+  }
+
+  /**
+   * add the transaction to list
+   * @param txn a transaction
+   */
+  public void appendTxn(String txn){
+      this.txList.add(txn);
+  }
+
+  /**
+   * calculate
+   * @return root hash
+   */
+  public String calRootHash(){
+      MerkleTree m = new MerkleTree(this.txList);
+      m.merkle_tree();
+      this.rootHash = m.getRoot();
+      return this.rootHash;
+  }
+
+  /**
+   *
+   * @return root hash
+   */
+  public String getRootHash(){
+      return this.rootHash;
   }
 
   /**
