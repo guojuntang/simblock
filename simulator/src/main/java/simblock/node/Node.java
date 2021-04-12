@@ -457,6 +457,11 @@ public class Node {
 			}
 	}
 
+  @Override
+  public String toString() {
+    return Integer.toString(this.nodeID);
+  }
+
   /**
    * Send next block message.
    */

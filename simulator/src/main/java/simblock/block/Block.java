@@ -18,7 +18,8 @@ package simblock.block;
 
 import simblock.node.Node;
 
-import java.util.ArrayList;
+import java.security.MessageDigest;
+import java.util.List;
 
 /**
  * The representation of a block.
@@ -40,10 +41,20 @@ public class Block {
   private String rootHash;
 
   /**
+   * current hash: SHA256(parentBlock.hash + minter.id + rootHash + time + id)
+   */
+  private String currentHash;
+
+  /**
+   * parent's hash
+   */
+  private String previousHash;
+
+  /**
    * Transactions' list, stored as json string
    * (block body)
    */
-  private ArrayList<String> txList;
+  private List<String> txnList;
 
   /**
    * The {@link Node} that minted the block.
@@ -67,6 +78,30 @@ public class Block {
 
   /**
    * Instantiates a new Block.
+   *
+   * @param parent
+   * @param minter
+   * @param time
+   * @param txnlist
+   */
+  public Block(Block parent, Node minter, long time, List<String> txnlist) {
+    this.height = parent == null ? 0 : parent.getHeight() + 1;
+    this.parent = parent;
+    this.minter = minter;
+    this.txnList = txnlist;
+    this.rootHash = this.calRootHash(txnList);
+    this.previousHash = (this.parent == null) ? "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f":this.parent.toString();
+    this.time = time;
+    this.id = latestId;
+    latestId++;
+
+    this.currentHash = this.calCurHash();
+  }
+
+
+  /**
+   * Instantiates a new Block.
+   * todo: remove latter
    *
    * @param parent the parent
    * @param minter the minter
@@ -97,6 +132,22 @@ public class Block {
    */
   public Block getParent() {
     return this.parent;
+  }
+
+  /**
+   * get current hash
+   * @return current hash
+   */
+  public String getCurrentHash(){
+    return this.currentHash;
+  }
+
+  /**
+   *  get previous hash
+   * @return previous hash
+   */
+  public String getPreviousHash(){
+    return  this.previousHash;
   }
 
   /**
@@ -136,8 +187,8 @@ public class Block {
    * @return the block
    */
   @SuppressWarnings("unused")
-  public static Block genesisBlock(Node minter) {
-    return new Block(null, minter, 0);
+  public static Block genesisBlock(Node minter, List<String> txnList) {
+    return new Block(null, minter, 0, txnList);
   }
 
   /**
@@ -155,22 +206,46 @@ public class Block {
   }
 
   /**
-   * add the transaction to list
-   * @param txn a transaction
+   * calculate root hash
+   * @return root hash
    */
-  public void appendTxn(String txn){
-      this.txList.add(txn);
+  private String calRootHash(List<String> txnList){
+      MerkleTree m = new MerkleTree(txnList);
+      m.merkle_tree();
+      return m.getRoot();
   }
 
   /**
-   * calculate
-   * @return root hash
+   *
+   * current hash: SHA256(parentBloc.hash + minter.id + rootHash + time + id)
+   *
+   * @return current hash
    */
-  public String calRootHash(){
-      MerkleTree m = new MerkleTree(this.txList);
-      m.merkle_tree();
-      this.rootHash = m.getRoot();
-      return this.rootHash;
+
+  private String calCurHash(){
+    // String s = this.previousHash + this.minter.toString() + this.rootHash + this.time + this.id;
+     String s = this.previousHash + ((this.minter == null)? "0" : this.minter.toString()) + this.rootHash + this.time + this.id;
+    byte[] cipher_byte;
+
+    try {
+      MessageDigest md = MessageDigest.getInstance("SHA-256");
+      md.update(s.getBytes());
+      cipher_byte = md.digest();
+      StringBuilder sb = new StringBuilder(2 * cipher_byte.length);
+      for (byte b : cipher_byte) {
+        sb.append(String.format("%02x", b & 0xff));
+      }
+      return sb.toString();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return "";
+
+  }
+
+  @Override
+  public String toString() {
+    return this.currentHash;
   }
 
   /**

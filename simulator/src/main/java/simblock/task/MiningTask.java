@@ -44,6 +44,7 @@ public class MiningTask extends AbstractMintingTask {
   @Override
   public void run() {
     ProofOfWorkBlock createdBlock = new ProofOfWorkBlock(
+
         (ProofOfWorkBlock) this.getParent(), this.getMinter(), getCurrentTime(),
         this.difficulty
     );
