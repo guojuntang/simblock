@@ -49,7 +49,10 @@ public class MiningTask extends AbstractMintingTask {
   @Override
   public void run() {
     List<Transaction> tmp = new ArrayList<Transaction>();
-    tmp.add(ProofOfWorkBlock.rewardedTxn(this.getMinter(), getCurrentTime()));
+    tmp.add(Transaction.rewardedTxn(this.getMinter()));
+    for (Transaction s: this.getMinter().getBuffer()) {
+        tmp.add(s);
+    }
     ProofOfWorkBlock createdBlock = new ProofOfWorkBlock(
         (ProofOfWorkBlock) this.getParent(), this.getMinter(), getCurrentTime(), tmp,
         this.difficulty

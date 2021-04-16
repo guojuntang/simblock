@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import simblock.block.Block;
+import simblock.block.Transaction;
 import simblock.node.Node;
 
 

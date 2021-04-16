@@ -116,19 +116,6 @@ public class ProofOfWorkBlock extends Block {
    * @param time
    * @return rewarded coins
    */
-  private static int calReward(long time){
-      return REWARD_COINS;
-  }
-
-  /**
-   * return coinbase transaction
-   * @param minter
-   * @return transaction string
-   */
-  public static Transaction rewardedTxn(Node minter, long time){
-      Transaction txn = new Transaction(COINBASE_ID, minter.getNodeID(), calReward(time));
-      return txn;
-  }
 
   /**
    * check  balance > value
@@ -164,7 +151,7 @@ public class ProofOfWorkBlock extends Block {
     }
 
     ArrayList<Transaction> txn = new ArrayList<Transaction>();
-    txn.add(rewardedTxn(minter ,0));
+    txn.add(Transaction.rewardedTxn(minter));
 
     genesisNextDifficulty = BigInteger.valueOf(totalMiningPower * getTargetInterval());
     return new ProofOfWorkBlock(null, minter, 0, txn, BigInteger.ZERO);

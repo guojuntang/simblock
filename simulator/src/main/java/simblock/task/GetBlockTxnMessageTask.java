@@ -17,7 +17,11 @@
 package simblock.task;
 
 import simblock.block.Block;
+import simblock.block.Transaction;
 import simblock.node.Node;
+
+import static simblock.simulator.Main.OUT_JSON_FILE;
+import static simblock.simulator.Timer.getCurrentTime;
 
 /**
  * The type GetBlockTxn message task.
@@ -29,8 +33,11 @@ public class GetBlockTxnMessageTask extends AbstractMessageTask {
      */
 	private Block block;
 
-	public GetBlockTxnMessageTask(Node from, Node to, Block block) {
+	private Transaction transaction;
+
+	public GetBlockTxnMessageTask(Node from, Node to, Transaction transaction, Block block) {
 		super(from, to);
+		this.transaction = transaction;
 		this.block = block;
 	}
     
@@ -41,5 +48,15 @@ public class GetBlockTxnMessageTask extends AbstractMessageTask {
      */
 	public Block getBlock(){
 		return this.block;
-	}	
+	}
+
+	public Transaction getTransaction(){
+		return this.transaction;
+	}
+
+	@Override
+	public void run() {
+
+		super.run();
+	}
 }

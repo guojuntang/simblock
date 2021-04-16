@@ -29,12 +29,10 @@ import static simblock.simulator.Timer.getCurrentTime;
 import static simblock.simulator.Timer.putTask;
 import static simblock.simulator.Timer.removeTask;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 import simblock.block.Block;
+import simblock.block.Transaction;
 import simblock.node.consensus.AbstractConsensusAlgo;
 import simblock.node.routing.AbstractRoutingTable;
 import simblock.task.AbstractMessageTask;
@@ -83,6 +81,11 @@ public class Node {
    * The node causes churn.
    */
   private boolean isChurnNode;
+
+  /**
+   * buffer for transaction
+   */
+  private List<Transaction> buffer;
 
   /**
    * The current block.
@@ -136,6 +139,7 @@ public class Node {
     this.miningPower = miningPower;
     this.useCBR = useCBR;
     this.isChurnNode = isChurnNode;
+    this.buffer = new ArrayList<Transaction>();
 
     try {
       this.routingTable = (AbstractRoutingTable) Class.forName(routingTableName).getConstructor(
@@ -166,6 +170,10 @@ public class Node {
     return this.region;
   }
 
+
+  public List<Transaction> getBuffer(){
+      return this.buffer;
+  }
   /**
    * Gets mining power.
    *
@@ -311,11 +319,7 @@ public class Node {
     OUT_JSON_FILE.print("\"block-id\":" + newBlock.getId() + ", ");
     OUT_JSON_FILE.print("\"block-hash\": \"" + newBlock.getCurrentHash() + "\", ");
     OUT_JSON_FILE.print("\"merkle-hash\": \"" + newBlock.getRootHash() + "\", ");
-    OUT_JSON_FILE.print("\"transactions\": [");
-    for (int i = 0; i < newBlock.getTxnList().size(); i++) {
-      OUT_JSON_FILE.print("\"" + newBlock.getTxnList().get(i) + ((i == newBlock.getTxnList().size() - 1)? "\"" :"\", "));
-    }
-    OUT_JSON_FILE.print("]");
+    OUT_JSON_FILE.print("\"transaction\": " + newBlock.getTxnList().toString() );
     OUT_JSON_FILE.print("}");
     OUT_JSON_FILE.print("},");
     OUT_JSON_FILE.flush();
@@ -365,6 +369,28 @@ public class Node {
     }
   }
 
+  //public void sendTxn(){
+  //  Transaction s = new Transaction(this.getNodeID(), -10,11, getCurrentTime());
+  //  for (Node to: this.routingTable.getNeighbors()) {
+  //    AbstractMessageTask task = new GetBlockTxnMessageTask(this, to, s, getBlock());
+  //    putTask(task);
+  //  }
+  //}
+
+
+  /**
+   * clear the buffer for transactions
+   */
+  public void clearBuffer(){
+      this.buffer.removeAll(this.block.getTxnList());
+  }
+
+  public void addToBuffer(Transaction s){
+      if(!this.buffer.contains(s)){
+          this.buffer.add(s);
+      }
+  }
+
   /**
    * Receive block.
    *
@@ -382,6 +408,9 @@ public class Node {
       this.minting();
       // Advertise received block
       this.sendInv(block);
+      // clear buffer
+      this.clearBuffer();
+
     } else if (!this.orphans.contains(block) && !block.isOnSameChainAs(this.block)) {
       // TODO better understand - what if orphan is not valid?
       // If the block was not valid but was an unknown orphan and is not on the same chain as the
@@ -423,7 +452,9 @@ public class Node {
     }
 
     if(message instanceof GetBlockTxnMessageTask){
-			this.messageQue.add((GetBlockTxnMessageTask) message);
+            GetBlockTxnMessageTask m  =  (GetBlockTxnMessageTask) message;
+			this.messageQue.add(m);
+			this.addToBuffer(m.getTransaction());
 			if(!sendingBlock){
 				this.sendNextBlockMessage();
 			}
@@ -438,8 +469,8 @@ public class Node {
 				downloadingBlocks.remove(block);
 				this.receiveBlock(block);
 			}else{
-				AbstractMessageTask task = new GetBlockTxnMessageTask(this, from, block);
-				putTask(task);
+				//AbstractMessageTask task = new GetBlockTxnMessageTask(this, from, getCurrentTime(),block);
+				//putTask(task);
 			}
 		}
 

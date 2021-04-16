@@ -17,6 +17,7 @@
 package simblock.block;
 
 import simblock.node.Node;
+import simblock.util.Helper;
 
 import java.security.MessageDigest;
 import java.util.ArrayList;
@@ -243,7 +244,7 @@ public class Block {
 
     ArrayList<String> new_list = new ArrayList<String>();
     for (Transaction s: this.getTxnList()) {
-        new_list.add(s.toString());
+        new_list.add(s.getTx_id());
     }
     MerkleTree m = new MerkleTree(new_list);
     m.merkle_tree();
@@ -260,25 +261,11 @@ public class Block {
   private String calCurHash(){
     // String s = this.previousHash + this.minter.toString() + this.rootHash + this.time + this.id;
      String s = this.previousHash + ((this.minter == null)? "0" : this.minter.toString()) + this.rootHash + this.time + this.id;
-    byte[] cipher_byte;
-
-    try {
-      MessageDigest md = MessageDigest.getInstance("SHA-256");
-      md.update(s.getBytes());
-      cipher_byte = md.digest();
-      StringBuilder sb = new StringBuilder(2 * cipher_byte.length);
-      for (byte b : cipher_byte) {
-        sb.append(String.format("%02x", b & 0xff));
-      }
-      return sb.toString();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    return "";
-
+     return Helper.calSHA256(s);
   }
 
   @Override
+  //todo: return json
   public String toString() {
     return this.currentHash;
   }
