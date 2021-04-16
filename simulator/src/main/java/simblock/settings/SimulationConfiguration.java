@@ -27,7 +27,12 @@ public class SimulationConfiguration {
   public static final int NUM_OF_NODES = 100;//600;//800;//6000;
   // public static final int NUM_OF_NODES = 600;//600;//800;//6000;
 
+  /**
+   *  Initial reward of minter
+   */
   public static final int REWARD_COINS = 50;
+
+  public static final int COINBASE_ID = -1;
 
   /**
    * The kind of routing table.
