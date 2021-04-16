@@ -18,9 +18,13 @@ package simblock.block;
 
 import static simblock.simulator.Simulator.getSimulatedNodes;
 import static simblock.simulator.Simulator.getTargetInterval;
+import static simblock.settings.SimulationConfiguration.REWARD_COINS;
 
 import java.math.BigInteger;
 import simblock.node.Node;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -40,8 +44,32 @@ public class ProofOfWorkBlock extends Block {
    * @param time       the time
    * @param difficulty the difficulty
    */
-  public ProofOfWorkBlock(ProofOfWorkBlock parent, Node minter, long time, BigInteger difficulty) {
-    super(parent, minter, time);
+  //public ProofOfWorkBlock(ProofOfWorkBlock parent, Node minter, long time, BigInteger difficulty) {
+  //  super(parent, minter, time);
+  //  this.difficulty = difficulty;
+
+  //  if (parent == null) {
+  //    this.totalDifficulty = BigInteger.ZERO.add(difficulty);
+  //    this.nextDifficulty = ProofOfWorkBlock.genesisNextDifficulty;
+  //  } else {
+  //    this.totalDifficulty = parent.getTotalDifficulty().add(difficulty);
+  //    // TODO: difficulty adjustment
+  //    this.nextDifficulty = parent.getNextDifficulty();
+  //  }
+
+  //}
+
+  /**
+   * Instantiates a new Proof of work block.
+   *
+   * @param parent     the parent
+   * @param minter     the minter
+   * @param time       the time
+   * @param txnlist    the transactions list
+   * @param difficulty the difficulty
+   */
+  public ProofOfWorkBlock(ProofOfWorkBlock parent, Node minter, long time, List<String> txnlist, BigInteger difficulty) {
+    super(parent, minter, time, txnlist);
     this.difficulty = difficulty;
 
     if (parent == null) {
@@ -83,6 +111,25 @@ public class ProofOfWorkBlock extends Block {
   }
 
   /**
+   * calculate minter reward
+   * @param time
+   * @return rewarded coins
+   */
+  private static int calReward(long time){
+      return REWARD_COINS;
+  }
+
+  /**
+   * return coinbase transaction
+   * @param minter
+   * @return transaction string
+   */
+  public static String rewardedTxn(Node minter, long time){
+      Transaction txn = new Transaction(minter.getNodeID(), minter.getNodeID(), calReward(time));
+      return txn.toString();
+  }
+
+  /**
    * Generates the genesis block, gets the total mining power and adjusts the difficulty of the
    * next block accordingly.
    *
@@ -94,7 +141,11 @@ public class ProofOfWorkBlock extends Block {
     for (Node node : getSimulatedNodes()) {
       totalMiningPower += node.getMiningPower();
     }
+
+    ArrayList<String> txn = new ArrayList<String>();
+    txn.add(rewardedTxn(minter ,0));
+
     genesisNextDifficulty = BigInteger.valueOf(totalMiningPower * getTargetInterval());
-    return new ProofOfWorkBlock(null, minter, 0, BigInteger.ZERO);
+    return new ProofOfWorkBlock(null, minter, 0, txn, BigInteger.ZERO);
   }
 }

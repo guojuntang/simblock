@@ -19,6 +19,9 @@ package simblock.task;
 import static simblock.simulator.Timer.getCurrentTime;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+
 import simblock.block.ProofOfWorkBlock;
 import simblock.node.Node;
 
@@ -43,9 +46,10 @@ public class MiningTask extends AbstractMintingTask {
 
   @Override
   public void run() {
+    List<String> tmp = new ArrayList<String>();
     ProofOfWorkBlock createdBlock = new ProofOfWorkBlock(
 
-        (ProofOfWorkBlock) this.getParent(), this.getMinter(), getCurrentTime(),
+        (ProofOfWorkBlock) this.getParent(), this.getMinter(), getCurrentTime(), tmp,
         this.difficulty
     );
     this.getMinter().receiveBlock(createdBlock);

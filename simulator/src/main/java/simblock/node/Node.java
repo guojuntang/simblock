@@ -302,12 +302,20 @@ public class Node {
    * @param newBlock the block to be logged
    */
   private void printAddBlock(Block newBlock) {
+    // todo: add the new content
     OUT_JSON_FILE.print("{");
     OUT_JSON_FILE.print("\"kind\":\"add-block\",");
     OUT_JSON_FILE.print("\"content\":{");
     OUT_JSON_FILE.print("\"timestamp\":" + getCurrentTime() + ",");
     OUT_JSON_FILE.print("\"node-id\":" + this.getNodeID() + ",");
-    OUT_JSON_FILE.print("\"block-id\":" + newBlock.getId());
+    OUT_JSON_FILE.print("\"block-id\":" + newBlock.getId() + ", ");
+    OUT_JSON_FILE.print("\"block-hash\": \"" + newBlock.getCurrentHash() + "\", ");
+    OUT_JSON_FILE.print("\"merkle-hash\": \"" + newBlock.getRootHash() + "\", ");
+    OUT_JSON_FILE.print("\"transactions\": [");
+    for (int i = 0; i < newBlock.getTxnList().size(); i++) {
+      OUT_JSON_FILE.print("\"" + newBlock.getTxnList().get(i) + ((i == newBlock.getTxnList().size() - 1)? "\"" :"\", "));
+    }
+    OUT_JSON_FILE.print("]");
     OUT_JSON_FILE.print("}");
     OUT_JSON_FILE.print("},");
     OUT_JSON_FILE.flush();

@@ -151,6 +151,15 @@ public class Block {
   }
 
   /**
+   *  get txn list
+   * @return txn list
+   */
+  public List<String> getTxnList(){
+    return  this.txnList;
+  }
+
+
+  /**
    * Get minter node.
    *
    * @return the node

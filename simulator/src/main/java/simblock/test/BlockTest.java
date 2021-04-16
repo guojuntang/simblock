@@ -24,5 +24,7 @@ public class BlockTest {
         System.out.println("b2 root hash:" + b2.getRootHash());
         System.out.println("b2 pre hash:" + b2.getPreviousHash());
         System.out.println("b2 cur hash:" + b2.getCurrentHash());
+
+        System.out.println(b2.getTxnList().toString());
     }
 }
