@@ -19,6 +19,7 @@ package simblock.block;
 import simblock.node.Node;
 
 import java.security.MessageDigest;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -54,7 +55,7 @@ public class Block {
    * Transactions' list, stored as json string
    * (block body)
    */
-  private List<String> txnList;
+  private List<Transaction> txnList;
 
   /**
    * The {@link Node} that minted the block.
@@ -84,12 +85,12 @@ public class Block {
    * @param time
    * @param txnlist
    */
-  public Block(Block parent, Node minter, long time, List<String> txnlist) {
+  public Block(Block parent, Node minter, long time, List<Transaction> txnlist) {
     this.height = parent == null ? 0 : parent.getHeight() + 1;
     this.parent = parent;
     this.minter = minter;
     this.txnList = txnlist;
-    this.rootHash = this.calRootHash(txnList);
+    this.rootHash = this.calRootHash();
     this.previousHash = (this.parent == null) ? "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f":this.parent.toString();
     this.time = time;
     this.id = latestId;
@@ -154,7 +155,7 @@ public class Block {
    *  get txn list
    * @return txn list
    */
-  public List<String> getTxnList(){
+  public List<Transaction> getTxnList(){
     return  this.txnList;
   }
 
@@ -196,7 +197,7 @@ public class Block {
    * @return the block
    */
   @SuppressWarnings("unused")
-  public static Block genesisBlock(Node minter, List<String> txnList) {
+  public static Block genesisBlock(Node minter, List<Transaction> txnList) {
     return new Block(null, minter, 0, txnList);
   }
 
@@ -215,13 +216,38 @@ public class Block {
   }
 
   /**
+   * update the hash in block
+   * (after adding new transactions to block)
+   */
+  private void updateHash(){
+      this.rootHash = this.calRootHash();
+      this.currentHash = this.calCurHash();
+  }
+
+  /**
+   * add new transactions to block and update the hash value
+   * @param list
+   */
+  public void appendTxn(List<Transaction> list){
+    for (Transaction s: list) {
+        this.txnList.add(s);
+    }
+    this.updateHash();
+  }
+
+  /**
    * calculate root hash
    * @return root hash
    */
-  private String calRootHash(List<String> txnList){
-      MerkleTree m = new MerkleTree(txnList);
-      m.merkle_tree();
-      return m.getRoot();
+  private String calRootHash(){
+
+    ArrayList<String> new_list = new ArrayList<String>();
+    for (Transaction s: this.getTxnList()) {
+        new_list.add(s.toString());
+    }
+    MerkleTree m = new MerkleTree(new_list);
+    m.merkle_tree();
+    return m.getRoot();
   }
 
   /**

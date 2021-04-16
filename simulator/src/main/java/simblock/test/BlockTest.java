@@ -1,6 +1,7 @@
 package simblock.test;
 
 import simblock.block.Block;
+import simblock.block.Transaction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,9 +11,8 @@ public class BlockTest {
      * temp test
      */
     public static void main(String[] args) {
-        List<String> tmp = new ArrayList<String>();
-        tmp.add("hello");
-        tmp.add("world");
+        List<Transaction> tmp = new ArrayList<Transaction>();
+        tmp.add(new Transaction(0,0, 1));
 
         Block b1 = new Block(null, null,1, tmp);
         Block b2 = new Block(b1, null, 2,tmp);

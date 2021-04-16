@@ -19,6 +19,7 @@ package simblock.block;
 import static simblock.simulator.Simulator.getSimulatedNodes;
 import static simblock.simulator.Simulator.getTargetInterval;
 import static simblock.settings.SimulationConfiguration.REWARD_COINS;
+import static simblock.settings.SimulationConfiguration.COINBASE_ID;
 
 import java.math.BigInteger;
 import simblock.node.Node;
@@ -68,7 +69,7 @@ public class ProofOfWorkBlock extends Block {
    * @param txnlist    the transactions list
    * @param difficulty the difficulty
    */
-  public ProofOfWorkBlock(ProofOfWorkBlock parent, Node minter, long time, List<String> txnlist, BigInteger difficulty) {
+  public ProofOfWorkBlock(ProofOfWorkBlock parent, Node minter, long time, List<Transaction> txnlist, BigInteger difficulty) {
     super(parent, minter, time, txnlist);
     this.difficulty = difficulty;
 
@@ -124,9 +125,29 @@ public class ProofOfWorkBlock extends Block {
    * @param minter
    * @return transaction string
    */
-  public static String rewardedTxn(Node minter, long time){
-      Transaction txn = new Transaction(minter.getNodeID(), minter.getNodeID(), calReward(time));
-      return txn.toString();
+  public static Transaction rewardedTxn(Node minter, long time){
+      Transaction txn = new Transaction(COINBASE_ID, minter.getNodeID(), calReward(time));
+      return txn;
+  }
+
+  /**
+   * check  balance > value
+   * @param node
+   * @param value
+   * @return true if valid
+   * todo:
+   */
+  public boolean isTxnValid(Node node, int value){
+      return false;
+  }
+
+  /**
+   * calculate balance
+   * @param node
+   * @return balance
+   */
+  public int calBalance(Node node){
+      return 0;
   }
 
   /**
@@ -142,7 +163,7 @@ public class ProofOfWorkBlock extends Block {
       totalMiningPower += node.getMiningPower();
     }
 
-    ArrayList<String> txn = new ArrayList<String>();
+    ArrayList<Transaction> txn = new ArrayList<Transaction>();
     txn.add(rewardedTxn(minter ,0));
 
     genesisNextDifficulty = BigInteger.valueOf(totalMiningPower * getTargetInterval());

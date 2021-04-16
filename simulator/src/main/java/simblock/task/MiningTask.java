@@ -23,7 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import simblock.block.ProofOfWorkBlock;
+import simblock.block.Transaction;
 import simblock.node.Node;
+import simblock.node.consensus.ProofOfWork;
 
 /**
  * The type Mining task.
@@ -46,9 +48,9 @@ public class MiningTask extends AbstractMintingTask {
 
   @Override
   public void run() {
-    List<String> tmp = new ArrayList<String>();
+    List<Transaction> tmp = new ArrayList<Transaction>();
+    tmp.add(ProofOfWorkBlock.rewardedTxn(this.getMinter(), getCurrentTime()));
     ProofOfWorkBlock createdBlock = new ProofOfWorkBlock(
-
         (ProofOfWorkBlock) this.getParent(), this.getMinter(), getCurrentTime(), tmp,
         this.difficulty
     );
