@@ -50,6 +50,7 @@ public class MiningTask extends AbstractMintingTask {
   public void run() {
     List<Transaction> tmp = new ArrayList<Transaction>();
     tmp.add(Transaction.rewardedTxn(this.getMinter()));
+    // move the transactions in buffer into transactions list of new block
     for (Transaction s: this.getMinter().getBuffer()) {
         tmp.add(s);
     }

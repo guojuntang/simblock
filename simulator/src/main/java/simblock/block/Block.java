@@ -21,7 +21,9 @@ import simblock.util.Helper;
 
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The representation of a block.
@@ -268,6 +270,99 @@ public class Block {
   //todo: return json
   public String toString() {
     return this.currentHash;
+  }
+
+  /**
+   * find the spent transaction output
+   * @param address (node_id as address)
+   * @return the index of unspent
+   */
+  private Map<String, List<Integer>> getAllSpentTXOs(int address){
+      Map<String, List<Integer>> spentTXOs = new HashMap<>();
+      // traverse the block
+      Block b = this;
+      do {
+        for (Transaction s: b.getTxnList()) {
+          if (s.isCoinbase()) {
+            continue;
+          }
+          for(TXInput input: s.getInputs()){
+            // match the transaction
+            if(input.getNode_id() == address){
+              List<Integer> spentOutIndexArray = spentTXOs.get(input.getId());
+              if(spentOutIndexArray == null) {
+                spentOutIndexArray = new ArrayList<Integer>();
+              }
+              spentOutIndexArray.add(input.getTXOutputIndex());
+              spentTXOs.put(input.getId(), spentOutIndexArray);
+            }
+          }
+        }
+        b = b.parent;
+      }while (b != null);
+    return  spentTXOs;
+  }
+
+
+  /**
+   * find the unspent transactions
+   * @param address
+   * @return
+   */
+  private List<Transaction> findUnspentTransaction(int address){
+    Map<String, List<Integer>> allSpentTXOs = this.getAllSpentTXOs(address);
+    List<Transaction> unspentTXOs = new ArrayList<Transaction>();
+    Block b = this;
+    do {
+      for (Transaction s: b.getTxnList()) {
+          String txId = s.getTx_id();
+          List<Integer> spentOutIndexArray = allSpentTXOs.get(txId);
+          for(int outIndex = 0; outIndex < s.getOutputs().size(); outIndex++){
+              if (spentOutIndexArray != null && spentOutIndexArray.contains(outIndex)){
+                continue;
+              }
+
+              if (s.getOutputs().get(outIndex).getNode_id() == address){
+                  unspentTXOs.add(s);
+              }
+          }
+      }
+      b = b.parent;
+    }while (b != null);
+    return unspentTXOs;
+  }
+
+  /**
+   * calculate the balance
+   * @param address
+   * @param amount
+   * @return
+   */
+  public SpendableOutputResult findSpendableOutputs(int address, int amount){
+      List<Transaction> unspentTxs = this.findUnspentTransaction(address);
+      int acc = 0;
+      Map<String, List<Integer>> unspentOuts = new HashMap<>();
+      for (Transaction s: unspentTxs){
+          String txId = s.getTx_id();
+        for (int outId = 0; outId < s.getOutputs().size(); outId++) {
+            TXOutput txOutput = s.getOutputs().get(outId);
+            if (txOutput.getNode_id() == address && (acc < amount)){
+              acc += txOutput.getValue();
+              List<Integer> outIds = unspentOuts.get(txId);
+              if (outIds == null){
+                outIds = new ArrayList<Integer>();
+                outIds.add(outId);
+              }else {
+                outIds.add(outId);
+              }
+              unspentOuts.put(txId, outIds);
+              if (acc >= amount){
+                break;
+              }
+            }
+        }
+      }
+      return new SpendableOutputResult(acc, unspentOuts);
   }
 
   /**

@@ -28,6 +28,18 @@ public class TXInput {
         this.node_id = node_id;
     }
 
+    public int getNode_id() {
+        return node_id;
+    }
+
+    public int getTXOutputIndex() {
+        return TXOutputIndex;
+    }
+
+    public String getId() {
+        return id;
+    }
+
     @Override
     public String toString() {
         return "{" +

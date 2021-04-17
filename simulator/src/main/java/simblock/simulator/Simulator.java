@@ -18,9 +18,8 @@ package simblock.simulator;
 
 import static simblock.simulator.Timer.getCurrentTime;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
+
 import simblock.block.Block;
 import simblock.block.Transaction;
 import simblock.node.Node;
@@ -36,6 +35,16 @@ public class Simulator {
    * A list of nodes that will be used in a simulation.
    */
   private static final ArrayList<Node> simulatedNodes = new ArrayList<>();
+
+  /**
+   * prng
+   */
+  private static final Random random = new Random(System.currentTimeMillis());
+
+  /**
+   * recording the node_id in transaction
+   */
+  private static final Set<Integer> txIdSet = new HashSet<>();
 
   /**
    * The target block interval in milliseconds.
@@ -136,6 +145,8 @@ public class Simulator {
       );
       // Update information for the new block
       propagation.put(node.getNodeID(), getCurrentTime() - block.getTime());
+
+      genTransaction(node, 5);
     } else {
       // If the block has not been seen by any node and there is no memory allocated
       //TODO move magic number to constant
@@ -152,7 +163,33 @@ public class Simulator {
       observedBlocks.add(block);
       // Record the propagation time
       observedPropagations.add(propagation);
+
+      txIdSet.add(node.getNodeID());
+
+      genTransaction(node, 20);
     }
+  }
+
+  /**
+   * generate a transaction message
+   * @param node transaction node
+   * @param bound the boundary of amount
+   */
+  public static void genTransaction(Node node, int bound){
+      if (!txIdSet.contains(node.getNodeID())){
+          return;
+      }
+      Transaction s;
+      int node_num = getSimulatedNodes().size();
+      int to_id = random.nextInt(node_num);
+      int amount = random.nextInt(bound) + 1;
+      try {
+        s = Transaction.newUTXOTransaction(node.getNodeID(), to_id, amount, node.getBlock());
+        txIdSet.add(to_id);
+        node.sendTxn(s);
+      }catch (Exception e){
+          System.out.println(e);
+      }
   }
 
   /**

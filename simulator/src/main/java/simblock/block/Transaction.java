@@ -3,9 +3,7 @@ package simblock.block;
 import simblock.node.Node;
 import simblock.util.Helper;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
+import java.util.*;
 
 import static simblock.settings.SimulationConfiguration.COINBASE_ID;
 import static simblock.settings.SimulationConfiguration.REWARD_COINS;
@@ -51,6 +49,24 @@ public class Transaction {
         return this.tx_id;
     }
 
+    public List<TXInput> getInputs() {
+        return inputs;
+    }
+
+    public List<TXOutput> getOutputs() {
+        return outputs;
+    }
+
+    /**
+     * check coinbase
+     * @return true if coinbase
+     */
+    public boolean isCoinbase(){
+        return (this.inputs.size() == 1)
+                && (this.inputs.get(0).getId().length() == 0)
+                && (this.inputs.get(0).getNode_id() == -1);
+    }
+
     @Override
     public String toString() {
         return "{" +
@@ -63,6 +79,42 @@ public class Transaction {
 
     private static int calReward(){
         return REWARD_COINS;
+    }
+
+    /**
+     * create a transaction
+     * @param from from address
+     * @param to to address
+     * @param amount amount
+     * @param block current block
+     * @return new Transaction
+     * @throws Exception
+     */
+    public static Transaction newUTXOTransaction(int from, int to, int amount, Block block) throws Exception{
+        SpendableOutputResult result = block.findSpendableOutputs(from, amount);
+        int acc = result.getAcc();
+        Map<String, List<Integer>> unspentOuts = result.getUnspentOuts();
+
+        if (acc < amount){
+            throw new Exception("not enough");
+        }
+        Iterator<Map.Entry<String, List<Integer>>> iterator = unspentOuts.entrySet().iterator();
+
+        List<TXInput> txInputs = new ArrayList<TXInput>();
+        while (iterator.hasNext()){
+            Map.Entry<String, List<Integer>> entry = iterator.next();
+            String txId = entry.getKey();
+            List<Integer> outIds = entry.getValue();
+            for (int outIndex: outIds) {
+                txInputs.add(new TXInput(txId, outIndex, from));
+            }
+        }
+        List<TXOutput> txOutputs = new ArrayList<TXOutput>();
+        txOutputs.add(new TXOutput(amount, to));
+        if (acc > amount){
+            txOutputs.add(new TXOutput((acc - amount), from));
+        }
+        return new Transaction(txInputs, txOutputs, getCurrentTime());
     }
 
     /**

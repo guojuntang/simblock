@@ -369,13 +369,16 @@ public class Node {
     }
   }
 
-  //public void sendTxn(){
-  //  Transaction s = new Transaction(this.getNodeID(), -10,11, getCurrentTime());
-  //  for (Node to: this.routingTable.getNeighbors()) {
-  //    AbstractMessageTask task = new GetBlockTxnMessageTask(this, to, s, getBlock());
-  //    putTask(task);
-  //  }
-  //}
+  /**
+   * send Transaction message to other block
+   * @param s transaction
+   */
+  public  void sendTxn(Transaction s){
+    for (Node to: this.routingTable.getNeighbors()) {
+      AbstractMessageTask task = new GetBlockTxnMessageTask(this, to, s, this.getBlock());
+      putTask(task);
+    }
+  }
 
 
   /**
@@ -385,6 +388,10 @@ public class Node {
       this.buffer.removeAll(this.block.getTxnList());
   }
 
+  /**
+   * add transaction to the buffer
+   * @param s transaction
+   */
   public void addToBuffer(Transaction s){
       if(!this.buffer.contains(s)){
           this.buffer.add(s);

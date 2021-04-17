@@ -16,6 +16,14 @@ public class TXOutput {
         this.node_id = node_id;
     }
 
+    public int getNode_id() {
+        return node_id;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
     @Override
     public String toString() {
         return "{" +
