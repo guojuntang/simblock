@@ -90,6 +90,15 @@ project(':simulator') {
         configure distSettings
     }
 
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        implementation group: 'org.mongodb', name: 'mongodb-driver', version: '3.12.8'
+        compile 'io.javalin:javalin:3.13.6'
+    }
+
     startScripts {
         applicationName = 'runSimBlock'
     }

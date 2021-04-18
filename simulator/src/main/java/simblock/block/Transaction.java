@@ -1,5 +1,6 @@
 package simblock.block;
 
+import org.bson.Document;
 import simblock.node.Node;
 import simblock.util.Helper;
 
@@ -55,6 +56,25 @@ public class Transaction {
 
     public List<TXOutput> getOutputs() {
         return outputs;
+    }
+
+    public Document getDocument(){
+        Document document = new Document("tx_id", this.tx_id)
+                .append("time", this.time);
+        List<Document> inputList = new ArrayList<>();
+        List<Document> outputList = new ArrayList<>();
+
+        for (TXInput input: this.inputs) {
+            inputList.add(input.getDocument());
+        }
+
+        for (TXOutput output: this.outputs) {
+            outputList.add(output.getDocument());
+        }
+        document.append("inputs", inputList)
+                .append("outputs", outputList);
+
+        return document;
     }
 
     /**

@@ -16,6 +16,7 @@
 
 package simblock.block;
 
+import org.bson.Document;
 import simblock.node.Node;
 import simblock.util.Helper;
 
@@ -303,6 +304,21 @@ public class Block {
     return  spentTXOs;
   }
 
+  public Document getDocument(){
+    List<Document> documentList = new ArrayList<>();
+    for (Transaction s: txnList) {
+      documentList.add(s.getDocument());
+    }
+    Document document = new Document("block_id", this.getId())
+            .append("height", this.getHeight())
+            .append("root_hash", this.getRootHash())
+            .append("current_hash", this.getCurrentHash())
+            .append("previous_hash", this.getPreviousHash())
+            .append("minter_id", this.getMinter().getNodeID())
+            .append("time", this.getTime())
+            .append("transactions", documentList);
+    return document;
+  }
 
   /**
    * find the unspent transactions

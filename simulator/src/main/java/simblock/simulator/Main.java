@@ -17,15 +17,7 @@
 package simblock.simulator;
 
 
-import static simblock.settings.SimulationConfiguration.ALGO;
-import static simblock.settings.SimulationConfiguration.AVERAGE_MINING_POWER;
-import static simblock.settings.SimulationConfiguration.END_BLOCK_HEIGHT;
-import static simblock.settings.SimulationConfiguration.INTERVAL;
-import static simblock.settings.SimulationConfiguration.NUM_OF_NODES;
-import static simblock.settings.SimulationConfiguration.STDEV_OF_MINING_POWER;
-import static simblock.settings.SimulationConfiguration.TABLE;
-import static simblock.settings.SimulationConfiguration.CBR_USAGE_RATE;
-import static simblock.settings.SimulationConfiguration.CHURN_NODE_RATE;
+import static simblock.settings.SimulationConfiguration.*;
 import static simblock.simulator.Network.getDegreeDistribution;
 import static simblock.simulator.Network.getRegionDistribution;
 import static simblock.simulator.Network.printRegion;
@@ -50,6 +42,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+
 import simblock.block.Block;
 import simblock.node.Node;
 import simblock.task.AbstractMintingTask;
@@ -63,6 +56,11 @@ public class Main {
    * The constant to be used as the simulation seed.
    */
   public static Random random = new Random(10);
+
+  /**
+   * MongdoDB JDBC
+   */
+  public static MongoDBJDBC dbjdbc = new MongoDBJDBC(MONGODB_ADDRESS, MONGODB_PORT);
 
   /**
    * The initial simulation time.
@@ -222,6 +220,9 @@ public class Main {
     } catch (IOException ex) {
       ex.printStackTrace();
     }
+
+    //persist data
+    dbjdbc.persist(blockList, orphans);
 
     OUT_JSON_FILE.print("{");
     OUT_JSON_FILE.print("\"kind\":\"simulation-end\",");

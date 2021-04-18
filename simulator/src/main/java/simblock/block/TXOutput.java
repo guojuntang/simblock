@@ -1,5 +1,7 @@
 package simblock.block;
 
+import org.bson.Document;
+
 public class TXOutput {
     /**
      * output value
@@ -14,6 +16,11 @@ public class TXOutput {
     public TXOutput(int value, int node_id){
         this.value = value;
         this.node_id = node_id;
+    }
+
+    public Document getDocument(){
+        return new Document("value", this.value)
+                .append("node_id", this.node_id);
     }
 
     public int getNode_id() {

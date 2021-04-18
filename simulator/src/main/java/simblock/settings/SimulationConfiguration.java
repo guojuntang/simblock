@@ -32,7 +32,25 @@ public class SimulationConfiguration {
    */
   public static final int REWARD_COINS = 50;
 
+  /**
+   * Coinbase mark
+   */
   public static final int COINBASE_ID = -1;
+
+  /**
+   * mongodb address
+   */
+  public static final String MONGODB_ADDRESS = "localhost";
+
+  /**
+   * mongodb database name
+   */
+  public static final String DB_NAME = "test";
+
+  /**
+   * mongodb port
+   */
+  public static final int MONGODB_PORT = 27017;
 
   /**
    * The kind of routing table.
