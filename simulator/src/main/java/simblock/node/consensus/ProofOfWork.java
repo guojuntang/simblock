@@ -58,6 +58,8 @@ public class ProofOfWork extends AbstractConsensusAlgo {
    * a bigger difficulty than its parent next difficulty and a bigger total difficulty compared to
    * the current block.
    *
+   * extension: return false if the integrity check fails
+   *
    * @param receivedBlock the received block
    * @param currentBlock  the current block
    * @return true if block is valid false otherwise
@@ -67,6 +69,11 @@ public class ProofOfWork extends AbstractConsensusAlgo {
     if (!(receivedBlock instanceof ProofOfWorkBlock)) {
       return false;
     }
+    // integrity fail
+    if (!receivedBlock.blockIntegrity()){
+      return false;
+    }
+
     ProofOfWorkBlock recPoWBlock = (ProofOfWorkBlock) receivedBlock;
     ProofOfWorkBlock currPoWBlock = (ProofOfWorkBlock) currentBlock;
     int receivedBlockHeight = receivedBlock.getHeight();

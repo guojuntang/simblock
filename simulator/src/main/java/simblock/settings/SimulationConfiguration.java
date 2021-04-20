@@ -27,6 +27,12 @@ public class SimulationConfiguration {
   public static final int NUM_OF_NODES = 100;//600;//800;//6000;
   // public static final int NUM_OF_NODES = 600;//600;//800;//6000;
 
+  // malign node number
+  public static final int NUM_OF_MALIGN_NODE = 0;
+
+  // the malign node's merkle hash will be set to 00000000000000000000000000000000
+  public static final String MALIGN_HASH = "00000000000000000000000000000000";
+
   /**
    *  Initial reward of minter
    */
@@ -63,6 +69,12 @@ public class SimulationConfiguration {
   //TODO not documented in markdown
   // TODO return to PoW
   public static final String ALGO = "simblock.node.consensus.ProofOfWork";
+
+
+  /**
+   * The consensus algorithm for simulating attacking
+   */
+  public static final String MALIGN_ALGO = "simblock.node.consensus.MalignProofOfWork";
 
   /**
    * The expected value of block generation interval. The difficulty of mining is automatically

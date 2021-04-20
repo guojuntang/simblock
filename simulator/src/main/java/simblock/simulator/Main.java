@@ -126,6 +126,9 @@ public class Main {
     // Setup network
     constructNetworkWithAllNodes(NUM_OF_NODES);
 
+    // Setup network with malign nodes
+    //constructNetworkWithAllNodes(NUM_OF_NODES, NUM_OF_MALIGN_NODE);
+
     // Initial block height, we stop at END_BLOCK_HEIGHT
     int currentBlockHeight = 1;
 
@@ -351,6 +354,86 @@ public class Main {
 
       OUT_JSON_FILE.print("{");
       OUT_JSON_FILE.print("\"kind\":\"add-node\",");
+      OUT_JSON_FILE.print("\"content\":{");
+      OUT_JSON_FILE.print("\"timestamp\":0,");
+      OUT_JSON_FILE.print("\"node-id\":" + id + ",");
+      OUT_JSON_FILE.print("\"region-id\":" + regionList.get(id - 1));
+      OUT_JSON_FILE.print("}");
+      OUT_JSON_FILE.print("},");
+      OUT_JSON_FILE.flush();
+
+    }
+
+    // Link newly generated nodes
+    for (Node node : getSimulatedNodes()) {
+      node.joinNetwork();
+    }
+
+    // Designates a random node (nodes in list are randomized) to mint the genesis block
+    getSimulatedNodes().get(0).genesisBlock();
+  }
+
+
+  /**
+   * Construct network with the provided number of nodes.
+   *
+   * Including malign nodes.
+   *
+   * @param numNodes the num nodes
+   */
+  public static void constructNetworkWithAllNodes(int numNodes, int malignNodesNum) {
+
+    // Random distribution of nodes per region
+    double[] regionDistribution = getRegionDistribution();
+    List<Integer> regionList = makeRandomListFollowDistribution(regionDistribution, false);
+
+    // Random distribution of node degrees
+    double[] degreeDistribution = getDegreeDistribution();
+    List<Integer> degreeList = makeRandomListFollowDistribution(degreeDistribution, true);
+
+    // List of nodes using compact block relay.
+    List<Boolean> useCBRNodes = makeRandomList(CBR_USAGE_RATE);
+
+    // List of churn nodes.
+    List<Boolean> churnNodes = makeRandomList(CHURN_NODE_RATE);
+
+    // normal nodes num = numNodes - malignNodesNum
+    for (int id = 1; id <= numNodes - malignNodesNum; id++) {
+      // Each node gets assigned a region, its degree, mining power, routing table and
+      // consensus algorithm
+      Node node = new Node(
+              id, degreeList.get(id - 1) + 1, regionList.get(id - 1), genMiningPower(), TABLE,
+              ALGO, useCBRNodes.get(id - 1), churnNodes.get(id - 1)
+      );
+      // Add the node to the list of simulated nodes
+      addNode(node);
+
+      OUT_JSON_FILE.print("{");
+      OUT_JSON_FILE.print("\"kind\":\"add-node\",");
+      OUT_JSON_FILE.print("\"content\":{");
+      OUT_JSON_FILE.print("\"timestamp\":0,");
+      OUT_JSON_FILE.print("\"node-id\":" + id + ",");
+      OUT_JSON_FILE.print("\"region-id\":" + regionList.get(id - 1));
+      OUT_JSON_FILE.print("}");
+      OUT_JSON_FILE.print("},");
+      OUT_JSON_FILE.flush();
+
+    }
+
+
+    // add malign nodes
+    for (int id = 1; id <= malignNodesNum; id++) {
+      // Each node gets assigned a region, its degree, mining power, routing table and
+      // consensus algorithm
+      Node node = new Node(
+              id, degreeList.get(id - 1) + 1, regionList.get(id - 1), genMiningPower(), TABLE,
+              MALIGN_ALGO, useCBRNodes.get(id - 1), churnNodes.get(id - 1)
+      );
+      // Add the node to the list of simulated nodes
+      addNode(node);
+
+      OUT_JSON_FILE.print("{");
+      OUT_JSON_FILE.print("\"kind\":\"add-malign-node\",");
       OUT_JSON_FILE.print("\"content\":{");
       OUT_JSON_FILE.print("\"timestamp\":0,");
       OUT_JSON_FILE.print("\"node-id\":" + id + ",");

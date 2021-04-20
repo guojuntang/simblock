@@ -195,6 +195,22 @@ public class Block {
   }
 
   /**
+   * set current hash
+   * @param currentHash
+   */
+  public void setCurrentHash(String currentHash) {
+    this.currentHash = currentHash;
+  }
+
+  /**
+   * set root hash
+   * @param rootHash
+   */
+  public void setRootHash(String rootHash) {
+    this.rootHash = rootHash;
+  }
+
+  /**
    * Generates the genesis block. The parent is set to null and the time is set to 0
    *
    * @param minter the minter
@@ -237,6 +253,14 @@ public class Block {
         this.txnList.add(s);
     }
     this.updateHash();
+  }
+
+  /**
+   * check whether block hash equal to current hash
+   * @return
+   */
+  public boolean blockIntegrity(){
+      return this.currentHash.equals(this.calCurHash()) && this.rootHash.equals(this.calRootHash());
   }
 
   /**
@@ -304,6 +328,11 @@ public class Block {
     return  spentTXOs;
   }
 
+
+  /**
+   * return the document for mongodb
+   * @return
+   */
   public Document getDocument(){
     List<Document> documentList = new ArrayList<>();
     for (Transaction s: txnList) {

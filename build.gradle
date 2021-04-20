@@ -97,6 +97,7 @@ project(':simulator') {
     dependencies {
         implementation group: 'org.mongodb', name: 'mongodb-driver', version: '3.12.8'
         compile 'io.javalin:javalin:3.13.6'
+        implementation 'org.slf4j:slf4j-simple:2.0.0-alpha1'
     }
 
     startScripts {
