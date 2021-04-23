@@ -124,10 +124,13 @@ public class Main {
     printRegion();
 
     // Setup network
-    constructNetworkWithAllNodes(NUM_OF_NODES);
+    if (NUM_OF_MALIGN_NODE == 0) {
+      constructNetworkWithAllNodes(NUM_OF_NODES);
+    }else {
+      // Setup network with malign nodes
+      constructNetworkWithAllNodes(NUM_OF_NODES, NUM_OF_MALIGN_NODE);
+    }
 
-    // Setup network with malign nodes
-    //constructNetworkWithAllNodes(NUM_OF_NODES, NUM_OF_MALIGN_NODE);
 
     // Initial block height, we stop at END_BLOCK_HEIGHT
     int currentBlockHeight = 1;
@@ -242,6 +245,10 @@ public class Main {
     simulationTime += end - start;
     // Log simulation time in milliseconds
     System.out.println(simulationTime);
+    dbjdbc.setSimulate_time(simulationTime);
+
+    // print the collection name
+    System.out.println("collection_name: " + dbjdbc.getCollection_name());
 
   }
 

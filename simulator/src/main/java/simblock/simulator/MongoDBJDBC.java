@@ -27,6 +27,8 @@ public class MongoDBJDBC {
 
     private String collection_name;
 
+    private long simulate_time;
+
     /**
      * Construct the object to persist data
      * @param address database address
@@ -42,6 +44,14 @@ public class MongoDBJDBC {
         }catch (Exception e){
             System.err.println(e.getClass().getName() + ": " + e.getMessage() );
         }
+    }
+
+    public String getCollection_name() {
+        return collection_name;
+    }
+
+    public void setSimulate_time(long simulate_time) {
+        this.simulate_time = simulate_time;
     }
 
     /**
@@ -85,13 +95,14 @@ public class MongoDBJDBC {
      */
     private void persistSimulatorInformation(List<Block> blockList){
         Document document = new Document("title", "simulator_information")
-                .append("time", getCurrentTime())
+                .append("simulate_time", this.simulate_time)
                 .append("block_num", blockList.size())
                 .append("node_total_num", NUM_OF_NODES)
                 .append("malign_node_num", NUM_OF_MALIGN_NODE)
-                .append("chains", this.chainList(blockList))
+                .append("node_num", blockList.size())
                 .append("corrupted_blocks", this.getCorruptedBlocks(blockList))
-                .append("corrupted_block_num", this.getCorruptedBlocks(blockList).size());
+                .append("corrupted_block_num", this.getCorruptedBlocks(blockList).size())
+                .append("chains", this.chainList(blockList));
 
         this.collection.insertOne(document);
     }

@@ -9,7 +9,7 @@ import static simblock.settings.SimulationConfiguration.*;
  */
 public class Server {
     // take place the collection_name with your own database
-    private static final MongoDBJDBC client = new MongoDBJDBC(MONGODB_ADDRESS, MONGODB_PORT, "simblock_1618864795963" );
+    private static final MongoDBJDBC client = new MongoDBJDBC(MONGODB_ADDRESS, MONGODB_PORT, "simblock_1619171981571" );
 
     public static void main(String[] args) {
         Javalin app = Javalin.create().start(7000);
@@ -39,7 +39,7 @@ public class Server {
         /**
          * show the transaction in block_id
          */
-        app.get("/transaction/:id", ctx -> ctx.result(client.getTransactionOnBlock(Integer.parseInt(ctx.pathParam("id")))));
+        app.get("/transactions/:id", ctx -> ctx.result(client.getTransactionOnBlock(Integer.parseInt(ctx.pathParam("id")))));
 
         /**
          * show information of the simulator
@@ -49,7 +49,7 @@ public class Server {
         /**
          * show the block in block_id
          */
-        app.get("/block/:id", ctx -> ctx.result(client.getOneBlock(Integer.parseInt(ctx.pathParam("id")))));
+        app.get("/blocks/:id", ctx -> ctx.result(client.getOneBlock(Integer.parseInt(ctx.pathParam("id")))));
 
     }
 }
