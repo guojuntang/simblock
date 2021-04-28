@@ -17,6 +17,7 @@
 package simblock.simulator;
 
 import static simblock.simulator.Timer.getCurrentTime;
+import static simblock.settings.SimulationConfiguration.TXN_LIMIT;
 
 import java.util.*;
 
@@ -50,6 +51,8 @@ public class Simulator {
    * The target block interval in milliseconds.
    */
   private static long targetInterval;
+
+  private static int txn_counter = 0;
 
   /**
    * Get simulated nodes list.
@@ -167,6 +170,7 @@ public class Simulator {
       txIdSet.add(node.getNodeID());
 
       genTransaction(node, 20);
+      txn_counter = 0;
     }
   }
 
@@ -176,7 +180,7 @@ public class Simulator {
    * @param bound the boundary of amount
    */
   public static void genTransaction(Node node, int bound){
-      if (!txIdSet.contains(node.getNodeID())){
+      if (!txIdSet.contains(node.getNodeID()) || (txn_counter >= TXN_LIMIT)){
           return;
       }
       Transaction s;
@@ -187,6 +191,7 @@ public class Simulator {
         s = Transaction.newUTXOTransaction(node.getNodeID(), to_id, amount, node.getBlock());
         txIdSet.add(to_id);
         node.sendTxn(s);
+        txn_counter++;
       }catch (Exception e){
           System.out.println(e);
       }

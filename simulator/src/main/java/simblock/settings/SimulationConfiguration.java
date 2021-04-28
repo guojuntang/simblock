@@ -27,6 +27,16 @@ public class SimulationConfiguration {
   public static final int NUM_OF_NODES = 100;//600;//800;//6000;
   // public static final int NUM_OF_NODES = 600;//600;//800;//6000;
 
+  /**
+   * The block height when a simulation ends.
+   */
+  //TODO revert
+  //public static final int END_BLOCK_HEIGHT = 100;
+  public static final int END_BLOCK_HEIGHT = 100;
+
+  // upper limit of transactions in each block
+  public static final int TXN_LIMIT = 3;
+
   // malign node number
   public static final int NUM_OF_MALIGN_NODE = 0;
 
@@ -109,13 +119,6 @@ public class SimulationConfiguration {
    * The reward a PoS minter gets for staking.
    */
   public static final double STAKING_REWARD = 0.01;
-
-  /**
-   * The block height when a simulation ends.
-   */
-  //TODO revert
-  //public static final int END_BLOCK_HEIGHT = 100;
-  public static final int END_BLOCK_HEIGHT = 10;
 
   /**
    * Block size. (unit: byte).

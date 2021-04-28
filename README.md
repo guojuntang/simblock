@@ -11,6 +11,10 @@ SimBlock has a visualization tool, by which you can see the transition of block 
 
 - [SimBlock Visualizer](https://github.com/dsg-titech/simblock-visualizer)
 
+## Extension
+
+This project extends some features of SimBlock, See [details](./docs/extend.md)
+
 ## License
 
 SimBlock is licensed under the Apache License, Version2.0.

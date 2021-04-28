@@ -99,7 +99,6 @@ public class MongoDBJDBC {
                 .append("block_num", blockList.size())
                 .append("node_total_num", NUM_OF_NODES)
                 .append("malign_node_num", NUM_OF_MALIGN_NODE)
-                .append("node_num", blockList.size())
                 .append("corrupted_blocks", this.getCorruptedBlocks(blockList))
                 .append("corrupted_block_num", this.getCorruptedBlocks(blockList).size())
                 .append("chains", this.chainList(blockList));

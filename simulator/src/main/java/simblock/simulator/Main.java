@@ -227,8 +227,6 @@ public class Main {
       ex.printStackTrace();
     }
 
-    //persist data
-    dbjdbc.persist(blockList, orphans);
 
     OUT_JSON_FILE.print("{");
     OUT_JSON_FILE.print("\"kind\":\"simulation-end\",");
@@ -246,6 +244,9 @@ public class Main {
     // Log simulation time in milliseconds
     System.out.println(simulationTime);
     dbjdbc.setSimulate_time(simulationTime);
+
+    //persist data
+    dbjdbc.persist(blockList, orphans);
 
     // print the collection name
     System.out.println("collection_name: " + dbjdbc.getCollection_name());
